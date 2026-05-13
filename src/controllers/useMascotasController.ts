@@ -36,14 +36,12 @@ export const useMascotasController = () => {
   const handleAddAnimal = async (animalData: any) => {
     try {
       setLoading(true);
-      // Creamos un objeto temporal para pasarlo al backend
-      // El factory lo usamos para asegurar que cumpla con el modelo
       const tempInstancia = AnimalFactory.crearAnimal(animalData.tipo, animalData);
       const savedData = await animalService.createMascota(tempInstancia.toJSON());
       
       const newInstancia = AnimalFactory.crearAnimal(savedData.tipo, savedData);
       setMascotas(prev => [...prev, newInstancia]);
-      showToast('Animal agregado correctamente');
+      showToast(`¡Se agregó a ${newInstancia.nombre} exitosamente!`);
     } catch (err: any) {
       setError(err.message || 'Error al agregar animal');
     } finally {
@@ -59,7 +57,7 @@ export const useMascotasController = () => {
       
       const updatedInstancia = AnimalFactory.crearAnimal(updatedData.tipo, updatedData);
       setMascotas(prev => prev.map(m => m.id === id ? updatedInstancia : m));
-      showToast('Animal actualizado correctamente');
+      showToast(`Los datos de ${updatedInstancia.nombre} han sido actualizados.`);
     } catch (err: any) {
       setError(err.message || 'Error al actualizar animal');
     } finally {
@@ -70,9 +68,14 @@ export const useMascotasController = () => {
   const handleDeleteAnimal = async (id: string) => {
     try {
       setLoading(true);
+      const animalToDrop = mascotas.find(m => m.id === id);
       await animalService.deleteMascota(id);
       setMascotas(prev => prev.filter(m => m.id !== id));
-      showToast('Animal eliminado');
+      if (animalToDrop) {
+        showToast(`Se despidió a ${animalToDrop.nombre}. ¡Le deseamos lo mejor!`);
+      } else {
+        showToast('Mascota eliminada correctamente');
+      }
     } catch (err: any) {
       setError(err.message || 'Error al eliminar animal');
     } finally {
