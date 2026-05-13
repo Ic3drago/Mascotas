@@ -46,7 +46,7 @@ export const AnimalForm: React.FC<Props> = ({ initialData, onSubmit, onCancel })
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 w-full max-w-md relative max-h-[90vh] overflow-y-auto">
+    <div className="bg-white/90 dark:bg-gray-800/95 backdrop-blur-xl p-6 rounded-2xl shadow-2xl border border-white/50 dark:border-gray-700/50 w-full max-w-md relative max-h-[90vh] overflow-y-auto">
       <button 
         onClick={onCancel}
         className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"

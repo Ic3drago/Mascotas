@@ -21,7 +21,7 @@ export const LandingPage = ({ onEnter }: Props) => {
       {/* Content */}
       <div className="relative z-20 text-center text-white px-4">
         <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight drop-shadow-lg">
-          Albergue de Mascotas
+          Mascotas
         </h1>
         <p className="text-xl md:text-2xl font-light mb-10 max-w-2xl mx-auto drop-shadow-md">
           Conectando corazones peludos con familias amorosas. Encuentra y gestiona a nuestros pequeños amigos.

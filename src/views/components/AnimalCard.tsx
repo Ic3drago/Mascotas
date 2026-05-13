@@ -11,7 +11,7 @@ interface Props {
 
 export const AnimalCard = ({ animal, onEdit, onDelete }: Props) => {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-5 flex flex-col border border-gray-100 dark:border-gray-700 overflow-hidden relative">
+    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-5 flex flex-col border border-white/40 dark:border-gray-700/50 overflow-hidden relative">
       {animal.imagen && (
         <div className="-mx-5 -mt-5 mb-4 h-48 overflow-hidden">
           <img 

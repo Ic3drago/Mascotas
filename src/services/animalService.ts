@@ -1,74 +1,103 @@
 import { AnimalData } from '../models/Animal';
+import { supabase } from '../lib/supabase';
 
-// Simulador de una Base de Datos (Mock DB) o Firebase
-const mockDB: AnimalData[] = [
-  { id: '1', nombre: 'Max', edad: 3, tipo: 'perro', raza: 'Golden Retriever', imagen: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=500' },
-  { id: '2', nombre: 'Luna', edad: 5, tipo: 'gato', colorPelo: 'Blanco con manchas', imagen: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=500' },
-  { id: '3', nombre: 'Paco', edad: 2, tipo: 'loro', sabeHablar: true, imagen: 'https://images.unsplash.com/photo-1552728089-57169282243e?auto=format&fit=crop&q=80&w=500' },
-];
+// NOTA DE DESARROLLO: 
+// Asegúrate de correr `npm install @supabase/supabase-js`
+// para que esta conexión funcione sin errores de compilación.
 
 export const animalService = {
-  // Simulamos delay de red con Promesas
   async getMascotas(): Promise<AnimalData[]> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const stored = localStorage.getItem('mascotas_db');
-        if (stored) {
-          resolve(JSON.parse(stored));
-        } else {
-          localStorage.setItem('mascotas_db', JSON.stringify(mockDB));
-          resolve(mockDB);
-        }
-      }, 500);
-    });
+    const { data, error } = await supabase
+      .from('mascotas')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw new Error(error.message);
+    
+    // Supabase devuelve los nombres de columnas tal cual en SQL (ej. color_pelo).
+    // Los mapeamos a nuestra interfaz de React (colorPelo).
+    return (data || []).map(row => ({
+      ...row,
+      colorPelo: row.color_pelo,
+      sabeHablar: row.sabe_hablar,
+    }));
   },
 
   async getMascotaById(id: string): Promise<AnimalData | null> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const stored = JSON.parse(localStorage.getItem('mascotas_db') || '[]');
-        const animal = stored.find((a: AnimalData) => a.id === id);
-        resolve(animal || null);
-      }, 300);
-    });
+    const { data, error } = await supabase
+      .from('mascotas')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) return null;
+    return {
+      ...data,
+      colorPelo: data.color_pelo,
+      sabeHablar: data.sabe_hablar,
+    };
   },
 
   async createMascota(animal: AnimalData): Promise<AnimalData> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const stored = JSON.parse(localStorage.getItem('mascotas_db') || '[]');
-        const newAnimal = { ...animal, id: crypto.randomUUID() };
-        stored.push(newAnimal);
-        localStorage.setItem('mascotas_db', JSON.stringify(stored));
-        resolve(newAnimal);
-      }, 500);
-    });
+    // Mapeamos de nuestro formato CamelCase al SnakeCase de la base de datos SQL
+    const insertData: any = {
+      nombre: animal.nombre,
+      edad: animal.edad,
+      tipo: animal.tipo,
+      imagen: animal.imagen,
+    };
+
+    if (animal.tipo === 'perro') insertData.raza = (animal as any).raza;
+    if (animal.tipo === 'gato') insertData.color_pelo = (animal as any).colorPelo;
+    if (animal.tipo === 'loro') insertData.sabe_hablar = (animal as any).sabeHablar;
+
+    const { data, error } = await supabase
+      .from('mascotas')
+      .insert([insertData])
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message);
+    return {
+      ...data,
+      colorPelo: data.color_pelo,
+      sabeHablar: data.sabe_hablar,
+    };
   },
 
   async updateMascota(id: string, animal: AnimalData): Promise<AnimalData> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const stored = JSON.parse(localStorage.getItem('mascotas_db') || '[]');
-        const index = stored.findIndex((a: AnimalData) => a.id === id);
-        if (index !== -1) {
-          stored[index] = { ...animal, id };
-          localStorage.setItem('mascotas_db', JSON.stringify(stored));
-          resolve(stored[index]);
-        } else {
-          reject(new Error('Mascota no encontrada'));
-        }
-      }, 500);
-    });
+    const updateData: any = {
+      nombre: animal.nombre,
+      edad: animal.edad,
+      tipo: animal.tipo,
+      imagen: animal.imagen,
+    };
+
+    if (animal.tipo === 'perro') updateData.raza = (animal as any).raza;
+    if (animal.tipo === 'gato') updateData.color_pelo = (animal as any).colorPelo;
+    if (animal.tipo === 'loro') updateData.sabe_hablar = (animal as any).sabeHablar;
+
+    const { data, error } = await supabase
+      .from('mascotas')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message);
+    return {
+      ...data,
+      colorPelo: data.color_pelo,
+      sabeHablar: data.sabe_hablar,
+    };
   },
 
   async deleteMascota(id: string): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const stored = JSON.parse(localStorage.getItem('mascotas_db') || '[]');
-        const filtered = stored.filter((a: AnimalData) => a.id !== id);
-        localStorage.setItem('mascotas_db', JSON.stringify(filtered));
-        resolve();
-      }, 500);
-    });
+    const { error } = await supabase
+      .from('mascotas')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw new Error(error.message);
   }
 };
