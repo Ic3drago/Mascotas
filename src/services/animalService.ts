@@ -39,17 +39,16 @@ export const animalService = {
   },
 
   async createMascota(animal: AnimalData): Promise<AnimalData> {
-    // Mapeamos de nuestro formato CamelCase al SnakeCase de la base de datos SQL
     const insertData: any = {
       nombre: animal.nombre,
       edad: animal.edad,
       tipo: animal.tipo,
       imagen: animal.imagen,
+      clase: animal.clase,
+      habitat: animal.habitat,
+      fauna: animal.fauna,
+      descripcion: animal.descripcion,
     };
-
-    if (animal.tipo === 'perro') insertData.raza = (animal as any).raza;
-    if (animal.tipo === 'gato') insertData.color_pelo = (animal as any).colorPelo;
-    if (animal.tipo === 'loro') insertData.sabe_hablar = (animal as any).sabeHablar;
 
     const { data, error } = await supabase
       .from('mascotas')
@@ -58,11 +57,7 @@ export const animalService = {
       .single();
 
     if (error) throw new Error(error.message);
-    return {
-      ...data,
-      colorPelo: data.color_pelo,
-      sabeHablar: data.sabe_hablar,
-    };
+    return data;
   },
 
   async updateMascota(id: string, animal: AnimalData): Promise<AnimalData> {
@@ -71,11 +66,11 @@ export const animalService = {
       edad: animal.edad,
       tipo: animal.tipo,
       imagen: animal.imagen,
+      clase: animal.clase,
+      habitat: animal.habitat,
+      fauna: animal.fauna,
+      descripcion: animal.descripcion,
     };
-
-    if (animal.tipo === 'perro') updateData.raza = (animal as any).raza;
-    if (animal.tipo === 'gato') updateData.color_pelo = (animal as any).colorPelo;
-    if (animal.tipo === 'loro') updateData.sabe_hablar = (animal as any).sabeHablar;
 
     const { data, error } = await supabase
       .from('mascotas')
@@ -85,11 +80,7 @@ export const animalService = {
       .single();
 
     if (error) throw new Error(error.message);
-    return {
-      ...data,
-      colorPelo: data.color_pelo,
-      sabeHablar: data.sabe_hablar,
-    };
+    return data;
   },
 
   async deleteMascota(id: string): Promise<void> {

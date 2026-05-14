@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TipoAnimal } from '../../models/Animal';
+import { AnimalData } from '../../models/Animal';
 import { X } from 'lucide-react';
 
 interface Props {
@@ -11,23 +11,25 @@ interface Props {
 export const AnimalForm: React.FC<Props> = ({ initialData, onSubmit, onCancel }) => {
   const [nombre, setNombre] = useState(initialData?.nombre || '');
   const [edad, setEdad] = useState<number | ''>(initialData?.edad || '');
-  const [tipo, setTipo] = useState<TipoAnimal>(initialData?.tipo || 'perro');
+  const [tipo, setTipo] = useState(initialData?.tipo || 'Mamífero');
   const [imagen, setImagen] = useState(initialData?.imagen || '');
   
-  // Atributos especiales
-  const [raza, setRaza] = useState(initialData?.raza || '');
-  const [colorPelo, setColorPelo] = useState(initialData?.colorPelo || '');
-  const [sabeHablar, setSabeHablar] = useState<boolean>(initialData?.sabeHablar || false);
-
+  // Enciclopedia
+  const [clase, setClase] = useState(initialData?.clase || '');
+  const [habitat, setHabitat] = useState(initialData?.habitat || '');
+  const [fauna, setFauna] = useState(initialData?.fauna || '');
+  const [descripcion, setDescripcion] = useState(initialData?.descripcion || '');
+  
   useEffect(() => {
     if (initialData) {
       setNombre(initialData.nombre);
       setEdad(initialData.edad);
       setTipo(initialData.tipo);
       setImagen(initialData.imagen || '');
-      setRaza(initialData.raza || '');
-      setColorPelo(initialData.colorPelo || '');
-      setSabeHablar(initialData.sabeHablar || false);
+      setClase(initialData.clase || '');
+      setHabitat(initialData.habitat || '');
+      setFauna(initialData.fauna || '');
+      setDescripcion(initialData.descripcion || '');
     }
   }, [initialData]);
 
@@ -35,18 +37,22 @@ export const AnimalForm: React.FC<Props> = ({ initialData, onSubmit, onCancel })
     e.preventDefault();
     if (!nombre || !edad) return;
 
-    const baseData = { nombre, edad: Number(edad), tipo, imagen };
-    let specificData = {};
+    const baseData = { 
+      nombre, 
+      edad: Number(edad), 
+      tipo, 
+      imagen,
+      clase,
+      habitat,
+      fauna,
+      descripcion
+    };
 
-    if (tipo === 'perro') specificData = { raza };
-    if (tipo === 'gato') specificData = { colorPelo };
-    if (tipo === 'loro') specificData = { sabeHablar };
-
-    onSubmit({ ...baseData, ...specificData });
+    onSubmit(baseData);
   };
 
   return (
-    <div className="bg-white/90 dark:bg-gray-800/95 backdrop-blur-xl p-6 rounded-2xl shadow-2xl border border-white/50 dark:border-gray-700/50 w-full max-w-md relative max-h-[90vh] overflow-y-auto">
+    <div className="bg-black p-6 rounded-2xl shadow-xl border border-gray-700 w-full max-w-md relative max-h-[90vh] overflow-y-auto text-white">
       <button 
         onClick={onCancel}
         className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
@@ -65,7 +71,7 @@ export const AnimalForm: React.FC<Props> = ({ initialData, onSubmit, onCancel })
             type="text" 
             value={nombre} 
             onChange={e => setNombre(e.target.value)}
-            className="w-full px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+            className="w-full px-4 py-2 rounded-xl border border-gray-600 bg-gray-900 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
             required
             placeholder="Ej: Firulais"
           />
@@ -77,7 +83,7 @@ export const AnimalForm: React.FC<Props> = ({ initialData, onSubmit, onCancel })
             type="number" 
             value={edad} 
             onChange={e => setEdad(e.target.value ? Number(e.target.value) : '')}
-            className="w-full px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+            className="w-full px-4 py-2 rounded-xl border border-gray-600 bg-gray-900 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
             required
             min="0"
           />
@@ -89,80 +95,83 @@ export const AnimalForm: React.FC<Props> = ({ initialData, onSubmit, onCancel })
             type="url" 
             value={imagen} 
             onChange={e => setImagen(e.target.value)}
-            className="w-full px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+            className="w-full px-4 py-2 rounded-xl border border-gray-600 bg-gray-900 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
             placeholder="https://ejemplo.com/foto.jpg"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Animal</label>
-          <select 
-            value={tipo} 
-            onChange={e => setTipo(e.target.value as TipoAnimal)}
-            disabled={!!initialData} // No permitimos cambiar tipo al editar por simplicidad
-            className="w-full px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all disabled:opacity-50"
-          >
-            <option value="perro">Perro</option>
-            <option value="gato">Gato</option>
-            <option value="loro">Loro/Ave</option>
-          </select>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Clase (ej. Mamífero, Ave)</label>
+          <input 
+            type="text" 
+            value={clase} 
+            onChange={e => setClase(e.target.value)}
+            className="w-full px-4 py-2 rounded-xl border border-gray-600 bg-gray-900 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+            placeholder="Ej: Mamífero"
+          />
         </div>
 
-        {/* Atributos dinámicos */}
-        {tipo === 'perro' && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Raza (Identificador)</label>
-            <input 
-              type="text" 
-              value={raza} 
-              onChange={e => setRaza(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-              required
-              placeholder="Ej: Golden Retriever"
-            />
-          </div>
-        )}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hábitat</label>
+          <input 
+            type="text" 
+            value={habitat} 
+            onChange={e => setHabitat(e.target.value)}
+            className="w-full px-4 py-2 rounded-xl border border-gray-600 bg-gray-900 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+            placeholder="Ej: Doméstico, Selva"
+          />
+        </div>
 
-        {tipo === 'gato' && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Color de Pelaje (Identificador)</label>
-            <input 
-              type="text" 
-              value={colorPelo} 
-              onChange={e => setColorPelo(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-              required
-              placeholder="Ej: Blanco con manchas"
-            />
-          </div>
-        )}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fauna</label>
+          <input 
+            type="text" 
+            value={fauna} 
+            onChange={e => setFauna(e.target.value)}
+            className="w-full px-4 py-2 rounded-xl border border-gray-600 bg-gray-900 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+            placeholder="Ej: Silvestre, Urbana"
+          />
+        </div>
 
-        {tipo === 'loro' && (
-          <div className="flex items-center space-x-3 pt-2">
-            <input 
-              type="checkbox" 
-              id="sabeHablar"
-              checked={sabeHablar} 
-              onChange={e => setSabeHablar(e.target.checked)}
-              className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 dark:ring-offset-gray-800"
-            />
-            <label htmlFor="sabeHablar" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              ¿Sabe hablar / cantar?
-            </label>
-          </div>
-        )}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descripción</label>
+          <textarea 
+            value={descripcion} 
+            onChange={e => setDescripcion(e.target.value)}
+            className="w-full px-4 py-2 rounded-xl border border-gray-600 bg-gray-900 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+            rows={3}
+            placeholder="Información adicional del animal..."
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Clasificación Taxonómica (Clase)</label>
+          <select 
+            value={tipo} 
+            onChange={e => setTipo(e.target.value)}
+            className="w-full px-4 py-2 rounded-xl border border-gray-600 bg-gray-900 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all disabled:opacity-50"
+          >
+            <option value="Mamífero">Mamífero</option>
+            <option value="Ave">Ave</option>
+            <option value="Reptil">Reptil</option>
+            <option value="Anfibio">Anfibio</option>
+            <option value="Pez">Pez</option>
+            <option value="Invertebrado">Invertebrado</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
 
         <div className="pt-4 flex space-x-3">
           <button 
             type="button"
             onClick={onCancel}
-            className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-xl font-medium transition-colors"
+            className="flex-1 px-4 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl font-medium transition-colors"
           >
             Cancelar
           </button>
           <button 
             type="submit"
-            className="flex-1 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium shadow-md shadow-indigo-500/30 transition-all active:scale-95"
+            className="flex-1 px-4 py-3 bg-yellow-900 hover:bg-yellow-800 text-white rounded-xl font-medium shadow-md shadow-yellow-900/30 transition-all active:scale-95"
           >
             {initialData ? 'Guardar Cambios' : 'Agregar'}
           </button>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Animal, AnimalFactory, AnimalData } from '../models/Animal';
+import { Animal, AnimalData } from '../models/Animal';
 import { animalService } from '../services/animalService';
 
 export const useMascotasController = () => {
@@ -19,8 +19,7 @@ export const useMascotasController = () => {
     try {
       setLoading(true);
       const data = await animalService.getMascotas();
-      // Pasar los datos por el Factory
-      const instancias = data.map(item => AnimalFactory.crearAnimal(item.tipo, item));
+      const instancias = data.map(item => new Animal(item));
       setMascotas(instancias);
     } catch (err: any) {
       setError(err.message || 'Error al cargar mascotas');
@@ -36,10 +35,8 @@ export const useMascotasController = () => {
   const handleAddAnimal = async (animalData: any) => {
     try {
       setLoading(true);
-      const tempInstancia = AnimalFactory.crearAnimal(animalData.tipo, animalData);
-      const savedData = await animalService.createMascota(tempInstancia.toJSON());
-      
-      const newInstancia = AnimalFactory.crearAnimal(savedData.tipo, savedData);
+      const savedData = await animalService.createMascota(animalData);
+      const newInstancia = new Animal(savedData);
       setMascotas(prev => [...prev, newInstancia]);
       showToast(`¡Se agregó a ${newInstancia.nombre} exitosamente!`);
     } catch (err: any) {
@@ -52,10 +49,8 @@ export const useMascotasController = () => {
   const handleEditAnimal = async (id: string, animalData: any) => {
     try {
       setLoading(true);
-      const tempInstancia = AnimalFactory.crearAnimal(animalData.tipo, animalData);
-      const updatedData = await animalService.updateMascota(id, tempInstancia.toJSON());
-      
-      const updatedInstancia = AnimalFactory.crearAnimal(updatedData.tipo, updatedData);
+      const updatedData = await animalService.updateMascota(id, animalData);
+      const updatedInstancia = new Animal(updatedData);
       setMascotas(prev => prev.map(m => m.id === id ? updatedInstancia : m));
       showToast(`Los datos de ${updatedInstancia.nombre} han sido actualizados.`);
     } catch (err: any) {

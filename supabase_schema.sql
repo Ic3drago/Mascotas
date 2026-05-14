@@ -10,6 +10,13 @@ CREATE TABLE mascotas (
   tipo VARCHAR(50) NOT NULL CHECK (tipo IN ('perro', 'gato', 'loro')),
   imagen TEXT,
   
+  -- Campos de Enciclopedia
+  clase VARCHAR(100),         -- ej. Mamífero, Ave, Reptil
+  habitat VARCHAR(255),       -- ej. Doméstico, Selva, Desierto
+  fauna VARCHAR(100),         -- ej. Silvestre, Urbana, Marina
+  descripcion TEXT,           -- Información adicional
+  
+  
   -- Campos específicos según el tipo de animal
   -- Usamos columnas opcionales, ya que no todos los animales las usan
   raza VARCHAR(255),          -- Solo para perros
@@ -46,3 +53,11 @@ VALUES (
   'https://images.unsplash.com/photo-1552728089-57169282243e?auto=format&fit=crop&q=80&w=500', 
   TRUE
 );
+
+-- Si ya tienes la tabla creada en Supabase, ejecuta estos comandos para agregar las nuevas columnas:
+-- ALTER TABLE mascotas DROP CONSTRAINT mascotas_tipo_check;
+-- ALTER TABLE mascotas ADD COLUMN clase VARCHAR(100);
+-- ALTER TABLE mascotas ADD COLUMN habitat VARCHAR(255);
+-- ALTER TABLE mascotas ADD COLUMN fauna VARCHAR(100);
+-- ALTER TABLE mascotas ADD COLUMN descripcion TEXT;
+
